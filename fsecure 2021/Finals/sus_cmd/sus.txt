@@ -1,0 +1,69 @@
+// arg2 is potentially the flag
+void fcn009a1c10(char * arg1, char* arg2){
+    int retPrev = unknown_9a20b4(1);
+    
+    int * unknown_thing = get9a3378();
+    
+    // possible returning in eax?
+    return unknown_9a20b0(unknown_thing[0], unknown_thing[1], retPrev, arg1, 0, arg2);
+}
+
+void fcn009a1c40() {
+    //int stackcookie = *(0x9a3004) ^ ebp;
+    // maybe, depends on whether data at 0x9a300f is 0.
+    int stackcookie_4h = ebp;
+    
+    // 0xe77d8032
+    int var_14h = *(0x9a2110);
+    // 0x7500
+    short var_10h = *(0x9a2114);
+    
+    // var_ch and var_8h together make up the key
+    int var_ch = 0x6f4d3c5b;
+    int var_8h = 0x0066e5d2;
+    
+    // START_R2_PDG_OUTPUT
+    // 0x59590000 | I actually believe this is overwritten and is the input for the flag
+    var_24h = *(int32_t *)0x9a2100;
+    // 0xe8658bc3
+    uStack36 = *(undefined4 *)0x9a2104;
+    // 0x0005ede8
+    uStack32 = *(undefined4 *)0x9a2108;
+    // 0x74c08400
+    uStack28 = *(undefined4 *)0x9a210c;
+    
+    index_outer = 0;   
+    uint8_t *puVar1;
+    uint8_t *puVar2;
+
+    do {
+        write_beginning = (uint8_t *)((int32_t)&var_24h + index_outer);
+        index_inner = index_outer + 3;
+        
+        // xor first byte
+        *write_beginning = *write_beginning ^ *(uint8_t *)((int32_t)&var_ch + index_outer % 7);
+        
+        // xor second byte
+        write_middle = (uint8_t *)((int32_t)&var_24h + index_outer + 1);
+        // quick maffs
+        // write_beginning  + 1 - &var_24h
+        // &var_24h + index_outer +1 - &var_24h
+        // index_outer+1
+        *write_middle = *write_middle ^ *(uint8_t *)((int32_t)&var_ch + (int32_t)(write_beginning + (1 - (int32_t)&var_24h)) % 7);
+        
+        // xor third byte
+        write_middle = (uint8_t *)((int32_t)&var_24h + index_outer + 2);
+        // quick maffs
+        // write_beginning  + 2 - &var_24h
+        // &var_24h + index_outer +2 - &var_24h
+        // index_outer+2
+        *write_middle = *write_middle ^ *(uint8_t *)((int32_t)&var_ch + (int32_t)(write_beginning + (2 - (int32_t)&var_24h)) % 7);
+        index_outer = index_inner;
+    } while (index_inner < 21);
+    fcn.009a1c10(0x9a2118, (int32_t)&var_24h);
+    // END_R2_PDG_OUTPUT
+    
+    if (stackcookie_4h ^ ebp != *(0x9a3004)){
+        badstuff();
+    }
+}

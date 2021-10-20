@@ -1,0 +1,27 @@
+void fcn.00000000(void)
+
+{
+    int32_t xor_key_uStack31;
+    int32_t var_17h;
+    int32_t var_13h;
+    undefined *var_ch;
+    int32_t var_8h;
+    
+    var_ch = &stack0x00000004;
+    xor_key_uStack31 = 0xf10d74aa;
+    var_17h._0_2_ = 0x8e8;
+    
+    real_xor_key = b"\xaa\x74\x0d\xf1" + b"\xe8\x08";
+    var_17h._2_1_ = 0;
+    
+    code* stage2 = 0x804c040;
+    for (index = 0; index < 0x3e; index = index + 1) {
+        *(uint8_t *)(index + stage2) =
+             *(uint8_t *)((int32_t)&xor_key_uStack31 + index % 6) ^ *(uint8_t *)(index + stage2);
+    }
+    *NULL = sym.imp.sysconf(0x1e);
+    mprotect(-*NULL & stage2, *NULL, 7);
+    (*(code *)stage2)();
+    // WARNING: Bad instruction - Truncating control flow here
+    halt_baddata();
+}

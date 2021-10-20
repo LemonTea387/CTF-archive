@@ -1,0 +1,82 @@
+# DogeX
+
+Whoever wrote this challenge has an unhealthy obsession with Doge.
+
+Looking through the executable with `strings` and Okteta (my choice of hex editor), I found 
+large strings of what appeared to be node.js code. Looking further, I found strings indicating
+that this was a node.js program compiled with [nexe](https://github.com/nexe/nexe). Unfortunately, I did not
+find a tool to extract it, but what I did find was the string of the script somewhere in the file. I found this by
+running the program, noting the output string of "I'm Doge but not Duge", and searching for it in the file. I copied
+this string (which was NULL-terminated so I know how long it was) into its own file, dogeX.js
+
+Here's an excerpt of the code.
+```
+var ascii_doge = require('ascii-doge');console.log(ascii_doge.toString());console.log("===== I'm Doge but not Duge, muh Sadge =====");eval(doge_rolling_back([43,6,40,1,68,77,63,1,27,12,86,36,30,20,100,14,104,27,35,3,69,4,54,42,92,74,69,31,97,75,109,8,43,6,40,1,68,77,50,34,84,85,19,28,54,30,100,125,39,13,35,36,125,69,109,116,18,29,93,17,39,0,43,93,104,13,41,21,85,1,43,35,92,65,19,9,33,12,48,70,58,7,102,0,85,28,49,38,6,13,27,80,48,27,61,67,60,6,100,91,11,16,34,58,26,11,71,27,60,7,100,94,41,27,53,90,84,2,35,42,
+//...
+function doge_naughty(messy_str){return messy_str.replace(/Z/g, "").replace(/X/g, "").replace(/V/g, "");}function doge_rolling_back(to_be_doged) {let roller = eval(doge_naughty('BXZVuZZZffVZVZer.from("SZGXlVGZcXVjZXVBtRE90XZVZVXaDNyUZXZV2lEMw==","ZXVZXbZXVaZXVseVZX6VZV4").tVXZVoStZXVZXVriZXVZXng("aZXVXZVZXsZXVZXVcZXVZXVii")'));let rolled = "";for(let i = 0; i < to_be_doged.length; i++) {rolled += String.fromCharCode(to_be_doged[i] ^ roller.charCodeAt(i % roller.length));}return rolled;}var doge_ray = [95, 105, 100, 95, 80, 45, 81];function doge() {doge_rolling(doge_ray);}function rocket(lul) {return lul;}let word = process.argv[2];var hmm = process.argv[3];if (process.argv.length == 4 && word.length == 7) {var doge_lottery = word.split('');console.log("Doge shezh: " + process.argv[2]);function woofn(foo, bar, bat) {console.log(foo);function nested() {console.log(['so', 'wow']);}nested();return bar;}let spaceZ_rocket = eval(rocket(doge_universe.constructor.constructor.prototype.doge));spaceZ_rocket.call();} else {console.log("Much sad, doge left...");}
+```
+
+From here, it was a pretty straight-forward script-reversing challenge. I ran a node.js beautifier
+to make it look nicer for reversing, and got to work on carefully replacing `eval`s with `console.log`s and
+replacing the eval with the logged out code.
+
+I also wanted to have some dynamic analysis. So I installed node and tried running it. After a few errors,
+I realised I needed to install some libraries like `vm2` and `crypto` and `ascii-doge` with `npm install`, and then it worked exactly like the exe file.
+
+Honestly, the doge-themed names really tripped me up. So I worked on renaming them. 
+It also has a path to several false leads, including fetching a fake flag from pastebin, and a fake decryption
+path.
+
+Eventually, I realised running `DOGE=doge DoGE_FLAG=667339644f476532744865334d306f6e56637962657278 node dogeX.js 5636831 hm` would give the flag. Well technically, it will give the hex value representation of the flag.
+
+## Solution
+```
+// Note: I found an easier way. First get rid of all the evals, then 
+// search for the "DoGE_FLAG" comparison, it should be compared against
+// doge_shezh, then write code to print out doge_shezh.
+// run `DOGE=doge DoGE_FLAG=0123456789abcdef node dogeX.js 5636831 hm`
+// (the 5636831 is explained below, the environment variables you can
+// figure out pretty easily by looking at the code, I think. Or maybe I spent too
+// long on this that it's obvious to me now). The DOGE needs to be set to doge,
+// but the DoGE_FLAG=... , the 0123... is just a placeholder for the flag because
+// we don't know it yet, and if it's empty (or not 16 characters) the code will exit early.
+// Running it should print out the flag in a hex string form.
+// You can sub the DoGE_FLAG=... to be this hex string and it should pass.
+// You can decode the hex with python or node with Buffer.from(hexstring, 'hex').toString();
+
+var crypto = require("crypto")
+
+// Got this value by passing in `DOGE=doge DoGE_FLAG=0123456789abcdef node dogeX.js 5636831 hm`
+// and checking the value of "lucky_key_str" in the "to" function.
+// The 5636831 is gotten from the numbers in doge_ray (controlled by user) 
+// minus the numbers in dogeWew. First character is a difference of 5, 
+// second character is a difference of 6, etc.
+// I don't expect to understand that immediately, just to give a hint if you want to take a look yourself. 
+
+// Also, I never got to make the program accept my flag for some reason, but I'm pretty sure I got the right flag.
+const hash = "5DOGE6DOGE3DOGE6DOGE8DOGE3DOGE1";
+
+// Everything else is straightforward to reverse, just replace evals with console.log or 
+// copy paste doge_rolling_back into your terminal to see what the code is or
+// see what weird long expressions evaluate to (sometimes a string, you can tell because you see 
+// a bunch of concatenation with "+").
+const key = crypto.createHash("SHA256").update(hash).digest();
+const decipher = crypto.createDecipheriv('rc4',key,'');
+
+let key2 = decipher.update('fa20f298318a269a2945f2a80a815f42',
+'hex',
+"utf8");
+try {
+    let cipher= crypto.createDecipheriv("aes-128-cbc", key2, "dogegoingmoon!@#");
+    let shiz = cipher.update('5ebc4f3610a2c8685cb9ee64d40450755556b17c2117e484bf715c5552da65d0','hex', 'hex');
+    shiz += cipher.final('hex');
+    // Convert to ASCII
+    const flag = Buffer.from(shiz, 'hex').toString();
+    console.log(flag);
+}
+catch (err){
+    console.log(err);
+}
+```
+
+Flag: `fs9dOGe2tHe3M0onVcyberx`

@@ -1,0 +1,23 @@
+void fcn.00000000(void)
+
+{
+    undefined4 uStack31;
+    int32_t var_17h;
+    int32_t var_13h;
+    undefined *var_ch;
+    int32_t var_8h;
+    
+    var_ch = &stack0x00000004;
+    uStack31 = 0xf10d74aa;
+    var_17h._0_2_ = 0x8e8;
+    var_17h._2_1_ = 0;
+    for (stack0xffffffec = 0; stack0xffffffec < 0x3e; stack0xffffffec = stack0xffffffec + 1) {
+        *(uint8_t *)(stack0xffffffec + 0x804c040) =
+             *(uint8_t *)((int32_t)&uStack31 + stack0xffffffec % 6) ^ *(uint8_t *)(stack0xffffffec + 0x804c040);
+    }
+    *NULL = func_0xfffffeca(0x1e);
+    func_0xfffffeba(-*NULL & 0x804c040, *NULL, 7);
+    (*(code *)0x804c040)();
+    // WARNING: Bad instruction - Truncating control flow here
+    halt_baddata();
+}
